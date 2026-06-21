@@ -97,9 +97,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-
         // Mid Calculation
         System.out.println("Mid of 10 and 20: " + calculateMid(10, 20));
 
@@ -138,16 +135,16 @@ public class Main {
 
         // Factors and Prime
         System.out.print("Enter a number: ");
-        int num = sc.nextInt();
+        try (Scanner sc = new Scanner(System.in)) {
+            int num = sc.nextInt();
 
-        System.out.println("Number of Factors: "
-                + countFactors(num));
+            System.out.println("Number of Factors: "
+                    + countFactors(num));
 
-        if (isPrime(num))
-            System.out.println(num + " is Prime");
-        else
-            System.out.println(num + " is Not Prime");
-
-        sc.close();
+            if (isPrime(num))
+                System.out.println(num + " is Prime");
+            else
+                System.out.println(num + " is Not Prime");
+        }
     }
 }
