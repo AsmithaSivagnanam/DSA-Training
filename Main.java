@@ -1,189 +1,134 @@
+package Day04;
+
 public class Main {
-    public static void main(String[] args) {
-        exampleCallByValue();
-        exampleCallByReference();
-        exampleReverseString();
-        exampleOddEvenCount();
-        exampleFactorial();
-        exampleDigitCount();
-        exampleLargeElements();
-        examplePrimeNumber();
-        exampleFibonacciSeries();
+
+    // Linked List Node
+    public static class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode(int val) {
+            this.val = val;
+        }
     }
 
-    private static void exampleCallByValue() {
-        int x = 10;
-        System.out.println("=== Call by value example ===");
-        System.out.println("Before: " + x);
-        modifyValue(x);
-        System.out.println("After: " + x);
-        System.out.println();
-    }
+    // 1. Merge Two Sorted Linked Lists
+    public static ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode dummy = new ListNode(0);
+        ListNode tail = dummy;
 
-    private static void modifyValue(int x) {
-        x = x + 5;
-        System.out.println("Inside modifyValue: " + x);
-    }
-
-    private static void exampleCallByReference() {
-        int[] data = { 10 };
-        System.out.println("=== Call by reference-like example ===");
-        System.out.println("Before: " + data[0]);
-        modifyArray(data);
-        System.out.println("After: " + data[0]);
-        System.out.println();
-    }
-
-    private static void modifyArray(int[] array) {
-        array[0] = array[0] + 5;
-        System.out.println("Inside modifyArray: " + array[0]);
-    }
-
-    private static void exampleReverseString() {
-        String text = "hello";
-        System.out.println("=== Reverse string example ===");
-        System.out.println("Original: " + text);
-        System.out.println("Reversed: " + reverseString(text));
-        System.out.println();
-    }
-
-    private static String reverseString(String s) {
-        return new StringBuilder(s).reverse().toString();
-    }
-
-    private static void exampleOddEvenCount() {
-        int[] numbers = { 1, 2, 3, 4, 5, 6, 7 };
-        System.out.println("=== Odd/Even count example ===");
-        System.out.println("Numbers: " + java.util.Arrays.toString(numbers));
-        int[] counts = countOddEven(numbers);
-        System.out.println("Odd count: " + counts[0]);
-        System.out.println("Even count: " + counts[1]);
-        System.out.println();
-    }
-
-    private static int[] countOddEven(int[] values) {
-        int odd = 0;
-        int even = 0;
-        for (int value : values) {
-            if (value % 2 == 0) {
-                even++;
+        while (list1 != null && list2 != null) {
+            if (list1.val <= list2.val) {
+                tail.next = list1;
+                list1 = list1.next;
             } else {
-                odd++;
+                tail.next = list2;
+                list2 = list2.next;
+            }
+            tail = tail.next;
+        }
+
+        tail.next = (list1 != null) ? list1 : list2;
+
+        return dummy.next;
+    }
+
+    // 2. Merge Sorted Array
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        int i = m - 1;
+        int j = n - 1;
+        int k = m + n - 1;
+
+        while (i >= 0 && j >= 0) {
+            if (nums1[i] > nums2[j]) {
+                nums1[k--] = nums1[i--];
+            } else {
+                nums1[k--] = nums2[j--];
             }
         }
-        return new int[] { odd, even };
-    }
 
-    private static void exampleFactorial() {
-        int n = 5;
-        System.out.println("=== Factorial example ===");
-        System.out.println("Number: " + n);
-        System.out.println("Factorial: " + factorial(n));
-        System.out.println();
-    }
-
-    private static long factorial(int n) {
-        long result = 1;
-        for (int i = 2; i <= n; i++) {
-            result *= i;
+        while (j >= 0) {
+            nums1[k--] = nums2[j--];
         }
-        return result;
     }
 
-    private static void exampleDigitCount() {
-        int value = 12345;
-        System.out.println("=== Digit count example ===");
-        System.out.println("Number: " + value);
-        System.out.println("Digits: " + countDigits(value));
-        System.out.println();
-    }
-
-    private static int countDigits(int value) {
-        value = Math.abs(value);
-        if (value == 0) {
-            return 1;
-        }
+    // 3. Maximum Consecutive Ones (Optimized)
+    public static int findMaxConsecutiveOnes(int[] nums) {
         int count = 0;
-        while (value > 0) {
-            value /= 10;
-            count++;
-        }
-        return count;
-    }
+        int maxCount = 0;
 
-    private static void exampleLargeElements() {
-        int[] values = { 4, 9, 1, 7, 9, 3, 5 };
-        System.out.println("=== Largest and second largest example ===");
-        System.out.println("Values: " + java.util.Arrays.toString(values));
-        int[] result = findLargestAndSecondLargest(values);
-        System.out.println("Largest: " + result[0]);
-        System.out.println("Second largest: " + result[1]);
-        System.out.println();
-    }
-
-    private static int[] findLargestAndSecondLargest(int[] values) {
-        int largest = Integer.MIN_VALUE;
-        int second = Integer.MIN_VALUE;
-        for (int value : values) {
-            if (value > largest) {
-                second = largest;
-                largest = value;
-            } else if (value > second && value < largest) {
-                second = value;
+        for (int num : nums) {
+            if (num == 1) {
+                count++;
+                maxCount = Math.max(maxCount, count);
+            } else {
+                count = 0;
             }
         }
-        if (second == Integer.MIN_VALUE) {
-            second = largest;
-        }
-        return new int[] { largest, second };
+
+        return maxCount;
     }
 
-    private static void examplePrimeNumber() {
-        int n = 29;
-        System.out.println("=== Prime number example ===");
-        System.out.println("Number: " + n);
-        System.out.println("Is prime? " + isPrime(n));
+    // 4. Maximum Subarray Sum (Kadane's Algorithm)
+    public static int maxSubArray(int[] nums) {
+        int currentSum = nums[0];
+        int maxSum = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            currentSum = Math.max(nums[i], currentSum + nums[i]);
+            maxSum = Math.max(maxSum, currentSum);
+        }
+
+        return maxSum;
+    }
+
+    // Print Linked List
+    public static void printList(ListNode head) {
+        while (head != null) {
+            System.out.print(head.val + " ");
+            head = head.next;
+        }
         System.out.println();
     }
 
-    private static boolean isPrime(int n) {
-        if (n <= 1) {
-            return false;
-        }
-        if (n <= 3) {
-            return true;
-        }
-        if (n % 2 == 0 || n % 3 == 0) {
-            return false;
-        }
-        for (int i = 5; i * i <= n; i += 6) {
-            if (n % i == 0 || n % (i + 2) == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
+    public static void main(String[] args) {
 
-    private static void exampleFibonacciSeries() {
-        int count = 10;
-        System.out.println("=== Fibonacci series example ===");
-        System.out.println("Count: " + count);
-        System.out.println("Series: " + java.util.Arrays.toString(fibonacciSeries(count)));
-        System.out.println();
-    }
+        // ===== Question 1 =====
+        System.out.println("Merge Two Sorted Linked Lists:");
 
-    private static int[] fibonacciSeries(int count) {
-        if (count <= 0) {
-            return new int[0];
+        ListNode l1 = new ListNode(1);
+        l1.next = new ListNode(2);
+        l1.next.next = new ListNode(4);
+
+        ListNode l2 = new ListNode(1);
+        l2.next = new ListNode(3);
+        l2.next.next = new ListNode(4);
+
+        ListNode mergedList = mergeTwoLists(l1, l2);
+        printList(mergedList);
+
+        // ===== Question 2 =====
+        System.out.println("\nMerge Sorted Array:");
+
+        int[] nums1 = {1, 2, 3, 0, 0, 0};
+        int[] nums2 = {2, 5, 6};
+
+        merge(nums1, 3, nums2, 3);
+
+        for (int num : nums1) {
+            System.out.print(num + " ");
         }
-        int[] series = new int[count];
-        series[0] = 0;
-        if (count > 1) {
-            series[1] = 1;
-        }
-        for (int i = 2; i < count; i++) {
-            series[i] = series[i - 1] + series[i - 2];
-        }
-        return series;
+
+        // ===== Question 3 =====
+        System.out.println("\n\nMaximum Consecutive Ones:");
+
+        int[] arr1 = {1, 1, 0, 1, 1, 1};
+        System.out.println(findMaxConsecutiveOnes(arr1));
+
+        // ===== Question 4 =====
+        System.out.println("\nMaximum Subarray Sum (Kadane's Algorithm):");
+
+        int[] arr2 = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+        System.out.println(maxSubArray(arr2));
     }
 }
