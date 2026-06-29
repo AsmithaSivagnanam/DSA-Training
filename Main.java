@@ -1,124 +1,98 @@
-package day05;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.*;
+public class Main {
+    // 1) Range Sum Query 2D (Prefix Sum Matrix)
+    static class NumMatrix {
+        private final int[][] prefix;
 
-class PrefixSuffixProblems {
-
-    // 1. Prefix Sum
-    public static int[] prefixSum(int[] arr) {
-        int n = arr.length;
-        int[] prefix = new int[n];
-
-        prefix[0] = arr[0];
-
-        for (int i = 1; i < n; i++) {
-            prefix[i] = prefix[i - 1] + arr[i];
-        }
-
-        return prefix;
-    }
-
-    // 2. Range Sum Query using Prefix Sum
-    public static int rangeSum(int[] prefix, int left, int right) {
-        if (left == 0) {
-            return prefix[right];
-        }
-        return prefix[right] - prefix[left - 1];
-    }
-
-    // 3. Suffix Sum
-    public static int[] suffixSum(int[] arr) {
-        int n = arr.length;
-        int[] suffix = new int[n];
-
-        suffix[n - 1] = arr[n - 1];
-
-        for (int i = n - 2; i >= 0; i--) {
-            suffix[i] = suffix[i + 1] + arr[i];
-        }
-
-        return suffix;
-    }
-
-    // 4. Equilibrium Point Index
-    public static int equilibriumIndex(int[] arr) {
-        int totalSum = 0;
-
-        for (int num : arr) {
-            totalSum += num;
-        }
-
-        int leftSum = 0;
-
-        for (int i = 0; i < arr.length; i++) {
-
-            totalSum -= arr[i]; // right sum
-
-            if (leftSum == totalSum) {
-                return i;
+        public NumMatrix(int[][] matrix) {
+            if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+                prefix = new int[0][0];
+                return;
             }
 
-            leftSum += arr[i];
+            int rows = matrix.length;
+            int cols = matrix[0].length;
+            prefix = new int[rows + 1][cols + 1];
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    prefix[i + 1][j + 1] = matrix[i][j]
+                            + prefix[i][j + 1]
+                            + prefix[i + 1][j]
+                            - prefix[i][j];
+                }
+            }
         }
 
-        return -1;
+        public int sumRegion(int row1, int col1, int row2, int col2) {
+            if (prefix.length == 0 || prefix[0].length == 0) {
+                return 0;
+            }
+            return prefix[row2 + 1][col2 + 1]
+                    - prefix[row1][col2 + 1]
+                    - prefix[row2 + 1][col1]
+                    + prefix[row1][col1];
+        }
     }
 
-    // 5. Pivot Index (LeetCode 724)
-    public static int pivotIndex(int[] nums) {
-        int totalSum = 0;
+    // 2) Subarray Sum Equals K (LeetCode 560)
+    static int subarraySumEqualsK(int[] nums, int k) {
+        Map<Integer, Integer> prefixCount = new HashMap<>();
+        prefixCount.put(0, 1);
+
+        int prefixSum = 0;
+        int count = 0;
 
         for (int num : nums) {
-            totalSum += num;
+            prefixSum += num;
+            int needed = prefixSum - k;
+            count += prefixCount.getOrDefault(needed, 0);
+            prefixCount.put(prefixSum, prefixCount.getOrDefault(prefixSum, 0) + 1);
         }
+        return count;
+    }
 
-        int leftSum = 0;
+    // 3) Longest Subarray With Sum K
+    static int longestSubarrayWithSumK(int[] nums, int k) {
+        Map<Integer, Integer> firstSeen = new HashMap<>();
+        firstSeen.put(0, -1);
+
+        int prefixSum = 0;
+        int longest = 0;
 
         for (int i = 0; i < nums.length; i++) {
-
-            int rightSum = totalSum - leftSum - nums[i];
-
-            if (leftSum == rightSum) {
-                return i;
+            prefixSum += nums[i];
+            int needed = prefixSum - k;
+            if (firstSeen.containsKey(needed)) {
+                longest = Math.max(longest, i - firstSeen.get(needed));
             }
-
-            leftSum += nums[i];
+            if (!firstSeen.containsKey(prefixSum)) {
+                firstSeen.put(prefixSum, i);
+            }
         }
-
-        return -1;
+        return longest;
     }
 
     public static void main(String[] args) {
+        System.out.println("=== Range Sum Query 2D ===");
+        int[][] matrix = {
+                {3, 0, 1, 4, 2},
+                {5, 6, 3, 2, 1},
+                {1, 2, 0, 1, 5},
+                {4, 1, 0, 3, 2}
+        };
+        NumMatrix numMatrix = new NumMatrix(matrix);
+        System.out.println(numMatrix.sumRegion(1, 1, 2, 3));
+        System.out.println(numMatrix.sumRegion(0, 0, 3, 3));
 
-        int[] arr = {1, 2, 3, 4, 5};
+        System.out.println("\n=== Subarray Sum Equals K ===");
+        int[] nums1 = {1, 1, 1};
+        System.out.println(subarraySumEqualsK(nums1, 2));
 
-        // Prefix Sum
-        int[] prefix = prefixSum(arr);
-        System.out.println("Prefix Sum:");
-        System.out.println(Arrays.toString(prefix));
-
-        // Range Sum Query
-        int left = 1;
-        int right = 3;
-
-        System.out.println("\nRange Sum (" + left + "," + right + "): "
-                + rangeSum(prefix, left, right));
-
-        // Suffix Sum
-        int[] suffix = suffixSum(arr);
-        System.out.println("\nSuffix Sum:");
-        System.out.println(Arrays.toString(suffix));
-
-        // Equilibrium Index Example
-        int[] eqArr = {-7, 1, 5, 2, -4, 3, 0};
-
-        System.out.println("\nEquilibrium Index: "
-                + equilibriumIndex(eqArr));
-
-        // Pivot Index Example
-        int[] pivotArr = {1, 7, 3, 6, 5, 6};
-
-        System.out.println("Pivot Index: "
-                + pivotIndex(pivotArr));
+        System.out.println("\n=== Longest Subarray With Sum K ===");
+        int[] nums2 = {1, 2, 1, 0, 1, 1, 1};
+        System.out.println(longestSubarrayWithSumK(nums2, 3));
     }
 }
