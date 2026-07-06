@@ -1,106 +1,29 @@
-package day11;
-
-import java.util.Scanner;
+package day12;
 
 public class LinkedList {
-    private Node head;
 
-    private static class Node {
-        int data;
-        Node next;
+    // -------------------- 1) Remove Nth Node from End --------------------
+    public static class ListNode {
+        int val;
+        ListNode next;
 
-        Node(int data) {
-            this.data = data;
-            this.next = null;
+        ListNode(int val) {
+            this.val = val;
         }
     }
 
-    public void insertAtEnd(int data) {
-        Node newNode = new Node(data);
-        if (head == null) {
-            head = newNode;
-            return;
+    public static ListNode removeNthFromEnd(ListNode head, int n) {
+        if (head == null || n <= 0) {
+            return head;
         }
 
-        Node temp = head;
-        while (temp.next != null) {
-            temp = temp.next;
-        }
-        temp.next = newNode;
-    }
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
 
-    public void takeInput() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter values to create linked list (-1 to stop):");
+        ListNode fast = dummy;
+        ListNode slow = dummy;
 
-        while (true) {
-            int value = sc.nextInt();
-            if (value == -1) {
-                break;
-            }
-            insertAtEnd(value);
-        }
-    }
-
-    public void printList() {
-        Node temp = head;
-        if (temp == null) {
-            System.out.println("Linked list is empty.");
-            return;
-        }
-
-        System.out.print("Linked List: ");
-        while (temp != null) {
-            System.out.print(temp.data + " -> ");
-            temp = temp.next;
-        }
-        System.out.println("null");
-    }
-
-    public int length() {
-        int count = 0;
-        Node temp = head;
-        while (temp != null) {
-            count++;
-            temp = temp.next;
-        }
-        return count;
-    }
-
-    public void printNthNode(int n) {
-        if (n <= 0) {
-            System.out.println("Invalid position.");
-            return;
-        }
-
-        Node temp = head;
-        int count = 1;
-        while (temp != null && count < n) {
-            temp = temp.next;
-            count++;
-        }
-
-        if (temp == null) {
-            System.out.println("Position out of range.");
-        } else {
-            System.out.println("Node at position " + n + " is: " + temp.data);
-        }
-    }
-
-    public void printKthNodeFromEnd(int k) {
-        if (k <= 0) {
-            System.out.println("Invalid value of k.");
-            return;
-        }
-
-        Node fast = head;
-        Node slow = head;
-
-        for (int i = 0; i < k; i++) {
-            if (fast == null) {
-                System.out.println("k is greater than list length.");
-                return;
-            }
+        for (int i = 0; i <= n; i++) {
             fast = fast.next;
         }
 
@@ -109,119 +32,95 @@ public class LinkedList {
             fast = fast.next;
         }
 
-        System.out.println("Kth node from end is: " + slow.data);
+        slow.next = slow.next.next;
+        return dummy.next;
     }
 
-    public void printMiddleNode() {
-        if (head == null) {
-            System.out.println("Linked list is empty.");
-            return;
-        }
-
-        Node slow = head;
-        Node fast = head;
-
-        while (fast != null && fast.next != null) {
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-
-        System.out.println("Middle node is: " + slow.data);
-    }
-
-    public void insertAtIth(int index, int data) {
-        if (index < 0) {
-            System.out.println("Invalid index.");
-            return;
-        }
-
-        Node newNode = new Node(data);
-
-        if (index == 0) {
-            newNode.next = head;
-            head = newNode;
-            return;
-        }
-
-        Node temp = head;
-        int count = 0;
-        while (temp != null && count < index - 1) {
+    public static void printList(ListNode head) {
+        ListNode temp = head;
+        while (temp != null) {
+            System.out.print(temp.val);
+            if (temp.next != null) {
+                System.out.print(" -> ");
+            }
             temp = temp.next;
-            count++;
         }
-
-        if (temp == null) {
-            System.out.println("Index out of range.");
-            return;
-        }
-
-        newNode.next = temp.next;
-        temp.next = newNode;
+        System.out.println();
     }
 
-    public void deleteAtIth(int index) {
-        if (head == null) {
-            System.out.println("Linked list is empty.");
-            return;
+    // -------------------- 2) Flatten a Linked List --------------------
+    public static class MultiLevelNode {
+        int val;
+        MultiLevelNode next;
+        MultiLevelNode child;
+
+        MultiLevelNode(int val) {
+            this.val = val;
+        }
+    }
+
+    public static MultiLevelNode flattenLinkedList(MultiLevelNode head) {
+        MultiLevelNode current = head;
+
+        while (current != null) {
+            if (current.child != null) {
+                MultiLevelNode tail = current.child;
+                while (tail.next != null) {
+                    tail = tail.next;
+                }
+
+                tail.next = current.next;
+                current.next = current.child;
+                current.child = null;
+            }
+            current = current.next;
         }
 
-        if (index < 0) {
-            System.out.println("Invalid index.");
-            return;
-        }
+        return head;
+    }
 
-        if (index == 0) {
-            head = head.next;
-            System.out.println("Deleted node at index 0.");
-            return;
-        }
-
-        Node temp = head;
-        int count = 0;
-        while (temp != null && count < index - 1) {
+    public static void printMultiLevelList(MultiLevelNode head) {
+        MultiLevelNode temp = head;
+        while (temp != null) {
+            System.out.print(temp.val);
+            if (temp.next != null) {
+                System.out.print(" -> ");
+            }
             temp = temp.next;
-            count++;
         }
-
-        if (temp == null || temp.next == null) {
-            System.out.println("Index out of range.");
-            return;
-        }
-
-        temp.next = temp.next.next;
-        System.out.println("Deleted node at index " + index + ".");
+        System.out.println();
     }
 
     public static void main(String[] args) {
-        LinkedList list = new LinkedList();
-        list.takeInput();
+        System.out.println("Removing nth node from end:");
+        ListNode head1 = new ListNode(1);
+        head1.next = new ListNode(2);
+        head1.next.next = new ListNode(3);
+        head1.next.next.next = new ListNode(4);
+        head1.next.next.next.next = new ListNode(5);
 
-        list.printList();
-        System.out.println("Length of linked list: " + list.length());
+        ListNode result = removeNthFromEnd(head1, 2);
+        printList(result);
 
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter position to print nth node: ");
-        int n = sc.nextInt();
-        list.printNthNode(n);
+        System.out.println("\nFlattening multi-level linked list:");
+        MultiLevelNode node1 = new MultiLevelNode(1);
+        MultiLevelNode node2 = new MultiLevelNode(2);
+        MultiLevelNode node3 = new MultiLevelNode(3);
+        MultiLevelNode node4 = new MultiLevelNode(4);
+        MultiLevelNode node5 = new MultiLevelNode(5);
+        MultiLevelNode node6 = new MultiLevelNode(6);
+        MultiLevelNode node7 = new MultiLevelNode(7);
+        MultiLevelNode node8 = new MultiLevelNode(8);
 
-        System.out.print("Enter k for kth node from end: ");
-        int k = sc.nextInt();
-        list.printKthNodeFromEnd(k);
+        node1.next = node2;
+        node2.next = node3;
+        node1.child = node4;
+        node4.next = node5;
+        node2.child = node6;
+        node3.child = node7;
+        node7.next = node8;
 
-        list.printMiddleNode();
-
-        System.out.print("Enter index to insert: ");
-        int insertIndex = sc.nextInt();
-        System.out.print("Enter value to insert: ");
-        int insertValue = sc.nextInt();
-        list.insertAtIth(insertIndex, insertValue);
-        list.printList();
-
-        System.out.print("Enter index to delete: ");
-        int deleteIndex = sc.nextInt();
-        list.deleteAtIth(deleteIndex);
-        list.printList();
-
-        sc.close();
+        MultiLevelNode flatHead = flattenLinkedList(node1);
+        printMultiLevelList(flatHead);
     }
 }
